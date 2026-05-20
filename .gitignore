@@ -1,0 +1,12 @@
+# Generated report files — do not commit
+reports/labels/
+reports/articles/
+reports/summary_*.md
+reports/ufo_research_report_*.md
+
+# Python runtime
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+.env

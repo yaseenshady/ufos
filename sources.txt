@@ -1,0 +1,30 @@
+# UFO/UAP Article Sources
+# One URL per line. Lines starting with # are ignored.
+# Used by labeler.py when no --urls argument is supplied.
+#
+# Add any UAP/UFO news article or official page you want fact-checked.
+# Run:  python labeler.py
+# -----------------------------------------------------------------
+
+# ── Official government portals ──────────────────────────────────
+https://www.war.gov/ufo/
+https://www.aaro.mil/
+https://www.aaro.mil/All-Domain-Anomaly-Resolution-Office/Historical-Record-Reports/
+
+# ── DoD / ODNI press releases ────────────────────────────────────
+https://www.war.gov/News/Releases/Release/Article/4480582/department-of-war-releases-unidentified-anomalous-phenomena-files-in-historic-t/
+
+# ── NASA UAP coverage ────────────────────────────────────────────
+https://science.nasa.gov/uap/
+
+# ── Congress / NDAA disclosures ──────────────────────────────────
+https://www.intelligence.senate.gov/press/senators-schumer-rounds-introduce-bipartisan-legislation-declassify-uap-government-records
+
+# ── Major news investigations ────────────────────────────────────
+https://www.nytimes.com/2017/12/16/us/politics/pentagon-program-unidentified-aerial-phenomena.html
+https://www.nytimes.com/2019/05/26/us/politics/ufo-sightings-navy-pilots.html
+https://www.washingtonpost.com/national-security/2021/06/25/ufo-report-congress/
+https://apnews.com/article/ufo-uap-government-report-congress-2023
+
+# ── Apollo 17 UAP photo coverage ─────────────────────────────────
+https://commanderswire.usatoday.com/story/tech/science/space/2026/05/08/ufo-uap-pentagon-trump-release-photos-declassified-files-aliens-extraterrestrial-life/89991868007/
