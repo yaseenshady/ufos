@@ -60,20 +60,22 @@ LABEL_PROMPT = """\
 You are an investigative fact-checker and research analyst specialising in
 UFO/UAP (Unidentified Anomalous Phenomena) news coverage.
 
-Your task is to analyse the article at the URL below and produce two outputs:
-  1. A fenced ```json block containing structured machine-readable labels.
-  2. A Markdown fact-check report immediately following the JSON block.
+Produce both outputs below NOW. Do NOT ask clarifying questions or wait for
+confirmation. Proceed immediately with the best available information.
 
 Article URL: {url}
 
 ──────────────────────────────────────────────────────────────────────────────
-INSTRUCTIONS
+INSTRUCTIONS (execute without pausing)
 ──────────────────────────────────────────────────────────────────────────────
 STEP 1  Fetch and read the full article at the URL above.
+        If the URL is inaccessible, search the web for the article title or
+        related coverage and use the best available public sources. Do not stop.
 STEP 2  Identify every factual claim, image, and piece of evidence.
-STEP 3  Cross-reference claims against other public sources and official records
-        (e.g. war.gov/ufo, aaro.mil, nasa.gov, congressional testimony).
-STEP 4  Output results in the exact format below — JSON block first, then report.
+STEP 3  Cross-reference claims against official records
+        (war.gov/ufo, aaro.mil, nasa.gov, congressional testimony, news archives).
+STEP 4  Write the JSON block and the Markdown report immediately.
+        Even if the URL is unreachable, complete the full analysis using web search.
 
 ──────────────────────────────────────────────────────────────────────────────
 OUTPUT FORMAT
@@ -150,6 +152,7 @@ def _build_client() -> CopilotClient:
 
     token = (
         os.environ.get("COPILOT_GITHUB_TOKEN")
+        or os.environ.get("GITHUB_COPILOT_API_TOKEN")
         or os.environ.get("GH_TOKEN")
         or os.environ.get("GITHUB_TOKEN")
     )

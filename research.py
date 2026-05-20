@@ -33,44 +33,49 @@ TARGET_URL = "https://www.war.gov/ufo/"
 # ---------------------------------------------------------------------------
 # Research prompt sent to the Copilot agent
 # ---------------------------------------------------------------------------
-RESEARCH_PROMPT = f"""You are a research analyst. Your task is to visit the official US government
-UAP (Unidentified Anomalous Phenomena) portal and produce a thorough, fact-checked report.
+RESEARCH_PROMPT = f"""You are a research analyst. Produce a thorough, fact-checked Markdown report
+on the official US government UAP (Unidentified Anomalous Phenomena) portal NOW.
+Do NOT ask clarifying questions. Proceed immediately with the best available information.
 
-Target site: {TARGET_URL}
+Primary target: {TARGET_URL}
 
-Please carry out the following steps:
+**Instructions (execute all steps without waiting for confirmation):**
 
-1. **Browse the site** – Fetch all pages and sub-pages available at {TARGET_URL}.
+1. **Browse** – Attempt to fetch {TARGET_URL} and linked sub-pages.
+   If unreachable, search the web for the following and use whatever you can access:
+   - "war.gov/ufo declassified UAP 2026 PURSUE release"
+   - https://www.aaro.mil/
+   - https://science.nasa.gov/uap/
+   - News coverage from AP, Reuters, NYT, USA Today on the May 2026 DoW PURSUE release.
+   Use every available source; do not stop because one URL is blocked.
 
-2. **Document inventory** – List every document, report, video, and image linked from the
-   site, including title, date, originating agency, and a brief description.
+2. **Document inventory** – List every document, report, video, and image found,
+   including title, date, originating agency, and a brief description.
 
-3. **Image analysis & fact-checking** – For every image or photograph published:
+3. **Image analysis & fact-checking** – For every image or photograph:
    - Describe what is depicted.
-   - Note the official caption, date, and source agency.
-   - Cross-reference the image with other publicly available information to assess
-     its credibility.
-   - Flag any inconsistencies, context gaps, or contested interpretations.
+   - Note official caption, date, and source agency.
+   - Cross-reference for credibility; flag inconsistencies.
 
-4. **Key claims analysis** – Identify the major factual claims or disclosures on the site
-   and evaluate each one:
-   - State the claim exactly as made.
-   - Assess supporting evidence (official documents, sensor data, witness accounts).
-   - Note any counter-evidence or expert disagreement.
-   - Assign a credibility rating (Verified / Plausible / Unverified / Contested).
+4. **Key claims analysis** – For each major factual claim:
+   - Quote the claim exactly.
+   - Assess supporting evidence.
+   - Note counter-evidence or expert disagreement.
+   - Rate: Verified / Plausible / Unverified / Contested.
 
-5. **Generate a Markdown report** with the following sections:
-   # UFO/UAP Research Report
-   ## Executive Summary
-   ## Site Overview
-   ## Document Inventory
-   ## Image Analysis & Fact-Check
-   ## Key Claims & Credibility Ratings
-   ## Overall Credibility Assessment
-   ## Sources & References
-   ## Research Metadata
+5. **Write the complete Markdown report now** with these exact sections:
 
-Be precise, cite specific details from the site, and maintain a neutral, analytical tone.
+# UFO/UAP Research Report
+## Executive Summary
+## Site Overview
+## Document Inventory
+## Image Analysis & Fact-Check
+## Key Claims & Credibility Ratings
+## Overall Credibility Assessment
+## Sources & References
+## Research Metadata
+
+Write the full report immediately. Be precise, cite specific sources, neutral tone.
 """
 
 # ---------------------------------------------------------------------------
@@ -81,6 +86,7 @@ def _build_client() -> CopilotClient:
     """Return a configured CopilotClient, honouring BYOK env vars when set."""
     github_token = (
         os.environ.get("COPILOT_GITHUB_TOKEN")
+        or os.environ.get("GITHUB_COPILOT_API_TOKEN")
         or os.environ.get("GH_TOKEN")
         or os.environ.get("GITHUB_TOKEN")
     )
@@ -161,6 +167,25 @@ async def run_research(reports_dir: Path = Path("reports")) -> Path:
             print("[*] Sending research prompt …\n")
             await session.send(RESEARCH_PROMPT)
             await idle_event.wait()
+
+            # If the agent asked a clarifying question instead of writing the report,
+            # push it to proceed immediately with what it knows.
+            first_response = "".join(message_parts)
+            short_or_question = (
+                "?" in first_response[-500:]
+                or "would you like" in first_response[-500:].lower()
+                or len(first_response.strip()) < 500
+            )
+            if short_or_question:
+                idle_event.clear()
+                print("\n[*] Agent asked for confirmation — pushing to proceed …\n")
+                await session.send(
+                    "Do not ask any more questions. Write the complete Markdown report "
+                    "right now using all knowledge you have about the US government UAP "
+                    "disclosures, the war.gov/ufo portal, the May 2026 PURSUE release, "
+                    "AARO, and NASA UAP findings. Include all required sections."
+                )
+                await idle_event.wait()
 
     print("\n\n[*] Research complete. Saving report …")
     report_path = _save_report("".join(message_parts), reports_dir)
